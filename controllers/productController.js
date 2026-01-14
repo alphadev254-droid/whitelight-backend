@@ -335,7 +335,16 @@ class ProductController {
 
       query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
       
-      const [products] = await pool.execute(query, [...params, limit, offset]);
+      const queryParams = params.concat([limit, offset]);
+      
+      console.log('🔍 Debug SQL:');
+      console.log('Query:', query);
+      console.log('Params:', params);
+      console.log('Limit:', limit, 'Type:', typeof limit);
+      console.log('Offset:', offset, 'Type:', typeof offset);
+      console.log('QueryParams:', queryParams);
+      
+      const [products] = await pool.execute(query, queryParams);
       const [countResult] = await pool.execute(countQuery, params);
 
       // Fetch images and variants for each product
