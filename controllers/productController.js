@@ -373,7 +373,14 @@ class ProductController {
             images: images,
             variants: variants,
             description: product.description,
-            tags: JSON.parse(product.tags || '[]'),
+            tags: (() => {
+              try {
+                return JSON.parse(product.tags || '[]');
+              } catch (e) {
+                console.error('Invalid JSON in tags for product:', product.id, product.tags);
+                return [];
+              }
+            })(),
             isNew: Boolean(product.is_new),
             isBestSeller: Boolean(product.is_best_seller),
             createdAt: product.created_at
@@ -447,7 +454,14 @@ class ProductController {
         images: images,
         variants: variants,
         description: product.description,
-        tags: JSON.parse(product.tags || '[]'),
+        tags: (() => {
+          try {
+            return JSON.parse(product.tags || '[]');
+          } catch (e) {
+            console.error('Invalid JSON in tags for product:', product.id, product.tags);
+            return [];
+          }
+        })(),
         isNew: Boolean(product.is_new),
         isBestSeller: Boolean(product.is_best_seller),
         createdAt: product.created_at
