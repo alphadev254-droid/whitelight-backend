@@ -157,8 +157,8 @@ class OrderController {
       query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
       params.push(limit, offset);
 
-      const [orders] = await pool.execute(query, params);
-      const [countResult] = await pool.execute(countQuery, status ? [status] : []);
+      const [orders] = await pool.query(query, params);
+      const [countResult] = await pool.query(countQuery, status ? [status] : []);
 
       res.json({
         success: true,
