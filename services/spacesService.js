@@ -26,7 +26,9 @@ class SpacesService {
 
     try {
       await this.s3Client.send(command);
-      const url = `${process.env.DO_SPACES_ENDPOINT}/${this.bucketName}/${fileName}`;
+      // Use CDN URL if available, otherwise use direct endpoint URL
+      const baseUrl = process.env.DO_SPACES_CDN_URL || `${process.env.DO_SPACES_ENDPOINT}/${this.bucketName}`;
+      const url = `${baseUrl}/${fileName}`;
       return {
         success: true,
         url,

@@ -60,6 +60,9 @@ class ProductController {
           const file = req.files[i];
           const uploadResult = await spacesService.uploadFile(file, 'products');
           
+          console.log('📸 Image uploaded:', uploadResult.url);
+          console.log('🌐 CDN URL used:', uploadResult.url.includes('cdn.digitaloceanspaces.com') ? 'YES' : 'NO');
+          
           if (uploadResult.success) {
             const imageId = `${productId}-${i + 1}`;
             await connection.execute(
@@ -73,7 +76,7 @@ class ProductController {
       // Insert variants with proper data handling
       if (parsedVariants && parsedVariants.length > 0) {
         for (const variant of parsedVariants) {
-          const variantId = `${productId}-${variant.size}`;
+          const variantId = `${productId}-${variant.size}-${Date.now()}`;
           await connection.execute(
             'INSERT INTO product_variants (id, product_id, size, in_stock, stock_quantity) VALUES (?, ?, ?, ?, ?)',
             [variantId, productId, variant.size, variant.inStock !== false, variant.stockQuantity || 10]
@@ -83,7 +86,7 @@ class ProductController {
         // Create default variants if none provided
         const defaultSizes = [40, 41, 42, 43, 44];
         for (const size of defaultSizes) {
-          const variantId = `${productId}-${size}`;
+          const variantId = `${productId}-${size}-${Date.now()}`;
           await connection.execute(
             'INSERT INTO product_variants (id, product_id, size, in_stock, stock_quantity) VALUES (?, ?, ?, ?, ?)',
             [variantId, productId, size, true, 10]
@@ -173,6 +176,9 @@ class ProductController {
           const file = req.files[i];
           const uploadResult = await spacesService.uploadFile(file, 'products');
           
+          console.log('📸 Image uploaded:', uploadResult.url);
+          console.log('🌐 CDN URL used:', uploadResult.url.includes('cdn.digitaloceanspaces.com') ? 'YES' : 'NO');
+          
           if (uploadResult.success) {
             const imageId = `${id}-${Date.now()}-${i}`;
             await connection.execute(
@@ -229,6 +235,20 @@ class ProductController {
     try {
       await connection.beginTransaction();
       const { id } = req.params;
+
+      // Check if product is referenced in any orders
+      const [orderItems] = await connection.execute(
+        'SELECT COUNT(*) as count FROM order_items WHERE product_id = ?',
+        [id]
+      );
+
+      if (orderItems[0].count > 0) {
+        await connection.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Cannot delete product. It is referenced in ${orderItems[0].count} order(s). Consider marking it as unavailable instead.`
+        });
+      }
 
       // Get all images before deleting to clean up from S3
       const [images] = await connection.execute(
