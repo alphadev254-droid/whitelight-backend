@@ -346,8 +346,8 @@ class ProductController {
       console.log('Offset:', offset, 'Type:', typeof offset);
       console.log('QueryParams:', queryParams);
       
-      const [products] = await pool.execute(query, queryParams);
-      const [countResult] = await pool.execute(countQuery, params);
+      const [products] = await pool.query(query, queryParams);
+      const [countResult] = await pool.query(countQuery, params);
 
       // Fetch images and variants for each product
       const productsWithDetails = await Promise.all(
