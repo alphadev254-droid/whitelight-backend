@@ -310,11 +310,11 @@ class ProductController {
       }
 
       if (isNew === 'true') {
-        conditions.push('is_new = TRUE');
+        conditions.push('is_new = 1');
       }
 
       if (isBestSeller === 'true') {
-        conditions.push('is_best_seller = TRUE');
+        conditions.push('is_best_seller = 1');
       }
 
       if (minPrice) {
