@@ -150,6 +150,16 @@ class ProductController {
         }
       }
 
+      // Parse images to delete
+      let imagesToDelete = req.body.imagesToDelete;
+      if (typeof imagesToDelete === 'string') {
+        try {
+          imagesToDelete = JSON.parse(imagesToDelete);
+        } catch (e) {
+          imagesToDelete = [];
+        }
+      }
+
       // Update product with proper data handling
       const [result] = await connection.execute(
         `UPDATE products SET name = ?, brand = ?, category = ?, price = ?, 
@@ -168,6 +178,24 @@ class ProductController {
           success: false,
           message: 'Product not found'
         });
+      }
+
+      // Delete specified images
+      if (imagesToDelete && imagesToDelete.length > 0) {
+        const [imagesToRemove] = await connection.execute(
+          `SELECT url FROM product_images WHERE id IN (${imagesToDelete.map(() => '?').join(',')})`,
+          imagesToDelete
+        );
+        
+        await connection.execute(
+          `DELETE FROM product_images WHERE id IN (${imagesToDelete.map(() => '?').join(',')})`,
+          imagesToDelete
+        );
+        
+        // Delete from Spaces
+        for (const img of imagesToRemove) {
+          await spacesService.deleteFile(img.url);
+        }
       }
 
       // Handle new image uploads
