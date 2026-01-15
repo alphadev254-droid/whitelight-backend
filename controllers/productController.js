@@ -304,7 +304,7 @@ class ProductController {
   async getProducts(req, res) {
     try {
       const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 12;
+      const limit = parseInt(req.query.limit) || 150;
       const offset = (page - 1) * limit;
       
       const { category, brand, search, isNew, isBestSeller, minPrice, maxPrice } = req.query;
