@@ -10,7 +10,7 @@ class BannerController {
          JOIN products p ON pi.product_id = p.id 
          WHERE p.is_new = true 
          ORDER BY p.created_at DESC 
-         LIMIT 5`
+         LIMIT 10`
       );
 
       res.json({
@@ -64,7 +64,7 @@ class BannerController {
          JOIN products p ON pi.product_id = p.id 
          WHERE p.is_best_seller = true 
          ORDER BY RAND() 
-         LIMIT 3`
+         LIMIT 8`
       );
 
       res.json({
