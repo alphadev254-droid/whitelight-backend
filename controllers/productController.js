@@ -15,7 +15,7 @@ class ProductController {
 
       const {
         name, brand, category, price, originalPrice,
-        description, tags, isNew, isBestSeller, variants
+        description, tags, isNew, isBestSeller, isOnOffer, variants
       } = req.body;
 
       // Generate slug and ID
@@ -45,12 +45,12 @@ class ProductController {
       // Insert product with all data
       await connection.execute(
         `INSERT INTO products (id, slug, name, brand, category, price, original_price, 
-         description, tags, is_new, is_best_seller) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         description, tags, is_new, is_best_seller, is_on_offer) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           productId, slug, name, brand, category, price, originalPrice || null,
           description, JSON.stringify(parsedTags), isNew === 'true' || isNew === true, 
-          isBestSeller === 'true' || isBestSeller === true
+          isBestSeller === 'true' || isBestSeller === true, isOnOffer === 'true' || isOnOffer === true
         ]
       );
 
@@ -124,7 +124,7 @@ class ProductController {
       const { id } = req.params;
       const {
         name, brand, category, price, originalPrice,
-        description, tags, isNew, isBestSeller, variants
+        description, tags, isNew, isBestSeller, isOnOffer, variants
       } = req.body;
 
       console.log('✏️ Update product request - ID:', id);
@@ -163,13 +163,14 @@ class ProductController {
       // Update product with proper data handling
       const [result] = await connection.execute(
         `UPDATE products SET name = ?, brand = ?, category = ?, price = ?, 
-         original_price = ?, description = ?, tags = ?, is_new = ?, is_best_seller = ? 
+         original_price = ?, description = ?, tags = ?, is_new = ?, is_best_seller = ?, is_on_offer = ? 
          WHERE id = ?`,
         [
           name, brand, category, price, originalPrice || null,
           description, JSON.stringify(parsedTags || []), 
           isNew === 'true' || isNew === true, 
-          isBestSeller === 'true' || isBestSeller === true, id
+          isBestSeller === 'true' || isBestSeller === true,
+          isOnOffer === 'true' || isOnOffer === true, id
         ]
       );
 
@@ -431,6 +432,7 @@ class ProductController {
             })(),
             isNew: Boolean(product.is_new),
             isBestSeller: Boolean(product.is_best_seller),
+            isOnOffer: Boolean(product.is_on_offer),
             createdAt: product.created_at
           };
         })
@@ -512,6 +514,7 @@ class ProductController {
         })(),
         isNew: Boolean(product.is_new),
         isBestSeller: Boolean(product.is_best_seller),
+        isOnOffer: Boolean(product.is_on_offer),
         createdAt: product.created_at
       };
 
