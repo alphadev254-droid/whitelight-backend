@@ -47,9 +47,11 @@ class OrderController {
         const subtotal = item.productPrice * item.quantity;
         await connection.execute(
           `INSERT INTO order_items (order_id, product_id, product_name, product_price, 
-           size, quantity, subtotal) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+           size, selected_sizes, quantity, subtotal, product_image, reference_link) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [orderId, item.productId, item.productName, item.productPrice, 
-           item.size, item.quantity, subtotal]
+           item.size, JSON.stringify(item.selectedSizes || [item.size]), item.quantity, subtotal, 
+           item.productImage || null, item.referenceLink || null]
         );
       }
 

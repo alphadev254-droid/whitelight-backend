@@ -12,7 +12,10 @@ const orderSchema = Joi.object({
       productName: Joi.string().required(),
       productPrice: Joi.number().positive().required(),
       size: Joi.number().integer().min(35).max(50).required(),
-      quantity: Joi.number().integer().min(1).max(10).required()
+      selectedSizes: Joi.array().items(Joi.number().integer().min(35).max(50)).optional(),
+      quantity: Joi.number().integer().min(1).max(10).required(),
+      productImage: Joi.string().uri().optional().allow(''),
+      referenceLink: Joi.string().optional().allow('')
     })
   ).min(1).required()
 });
